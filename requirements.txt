@@ -1,0 +1,17 @@
+pandas==2.2.3
+spacy==3.8.4
+datasets==3.2.0
+langid==1.1.6
+tqdm==4.67.1
+bertopic==0.16.4
+pyarrow==19.0.0
+contractions==0.1.73
+matplotlib==3.10.0
+powerlaw==1.5
+umap-learn==0.5.7
+hdbscan==0.8.40
+sentence-transformers==3.4.1
+transformers==4.48.2
+igraph==0.11.8
+seaborn==0.13.2
+numpy==1.26.4
