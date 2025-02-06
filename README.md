@@ -28,8 +28,7 @@ pip install -r requirements.txt
 
 (If you don't process this locally, request the zipped dataset as mentioned earlier.)
 
-### 4️⃣ Run python sna.py  
-    Power-law fitting for degree distribution
+### 4️⃣ Run sna.py  
 
 
 
