@@ -20,7 +20,7 @@ Due to **space constraints**, the following files are **not included in this rep
 To run this project, you need to install all dependencies listed in `requirements.txt`.
 
 ### **1️⃣ Install Required Libraries**
-```bash
+
 pip install -r requirements.txt
 
 ### **2️⃣ Run functions.py ** 
