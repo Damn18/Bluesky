@@ -14,15 +14,6 @@ import contractions
 import matplotlib.pyplot as plt
 from functions import preprocess_text, is_english, parallel_language_detection, parallel_preprocessing
 
-# ---------------------------------------------------------------------
-# Precompile regex patterns for efficiency
-URL_REGEX = re.compile(r"http\S+|www\S+")
-NON_ALPHA_REGEX = re.compile(r"[^a-zA-Z\s]")
-WHITESPACE_REGEX = re.compile(r"\s+")
-
-# Load SpaCy model for English language processing (with unneeded components disabled)
-nlp = spacy.load("en_core_web_sm", disable=["ner", "parser"])
-
 # Start execution timer
 start_time = time.time()
 
