@@ -17,7 +17,7 @@ try:
     print("Loading dataset...")
     file_path = "bluesky_processed.snappy.parquet"
     # For testing, we load 10,000 rows; remove slicing when running on the full dataset.
-    df = pq.read_table(file_path).to_pandas()
+    df = pq.read_table(file_path).to_pandas()[:100]
     print(f"Dataset loaded successfully. Number of rows: {len(df)}")
 except Exception as e:
     print("Error loading dataset:", e)
@@ -104,6 +104,11 @@ try:
     density = G.density()
     print(f"Reciprocity rate: {reciprocity:.2%}")
     print(f"Network density: {density:.6f}")
+except Exception as e:
+    print("Error computing network statistics:", e)
+    exit(1)
+
+
 
 # ---------------------------
 # 4. Degree Distribution Analysis 
@@ -178,29 +183,6 @@ except Exception as e:
     print("Error processing top authors:", e)
     exit(1)
 
-# ---------------------------
-# 7. Visualizations
-# ---------------------------
-try:
-    # (a) Network Metrics Bar Chart
-    plt.figure(figsize=(8, 6))
-    x_labels = ["Avg Deg", "Avg Path Len", "Diameter", "Modularity"]
-    y_values = [
-        avg_degree,
-        avg_path_length if avg_path_length != float('inf') else 0,
-        diameter if diameter != float('inf') else 0,
-        modularity,
-    ]
-    plt.bar(x_labels, y_values, color='orange', alpha=0.5)
-    for i, v in enumerate(y_values):
-        plt.text(i, v + 0.005, f"{v:.2f}", ha='center')
-    plt.ylabel("Metric Value")
-    plt.title("Network Metrics")
-    plt.savefig("network_metrics_bar_chart.png", dpi=300)
-    print("Saved 'network_metrics_bar_chart.png'.")
-except Exception as e:
-    print("Error in visualizations:", e)
-    exit(1)
 
 # End timer and report total elapsed time
 end_time = time.time()
