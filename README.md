@@ -22,13 +22,13 @@ Due to **space constraints**, the following files are **not included in this rep
 
 pip install -r requirements.txt
 
-### ** 2️⃣ Run functions.py ** 
+### 2️⃣ Run functions.py 
 
-### **3️⃣ Run preprocessing_berTopic.py ** 
+### 3️⃣ Run preprocessing_berTopic.py 
 
 (If you don't process this locally, request the zipped dataset as mentioned earlier.)
 
-### **4️⃣ Run python sna.py ** 
+### 4️⃣ Run python sna.py  
     Power-law fitting for degree distribution
 
 
