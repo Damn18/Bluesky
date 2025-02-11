@@ -7,35 +7,29 @@ import powerlaw
 import numpy as np
 import seaborn as sns
 
-# Start timer
 start_time = time.time()
 
-# ---------------------------
-# 1. Load dataset
-# ---------------------------
+# Dataset
 try:
     print("Loading dataset...")
     file_path = "bluesky_processed.snappy.parquet"
-    # For testing, we load 10,000 rows; remove slicing when running on the full dataset.
-    df = pq.read_table(file_path).to_pandas()[:100]
+    df = pq.read_table(file_path).to_pandas()
     print(f"Dataset loaded successfully. Number of rows: {len(df)}")
 except Exception as e:
     print("Error loading dataset:", e)
     exit(1)
 
-# ---------------------------
-# 2. Build the directed graph 
-# ---------------------------
+# Directed graph 
 try:
     print("Creating directed graph...")
 
-    # Create a mapping from post URI to author (vectorized)
+    # Mapping from URI to author
     uri_to_author = df.set_index("uri")["author"].to_dict()
 
     # Filter only posts that are replies
     df_filtered = df.dropna(subset=["reply_to"]).copy()
 
-    # Map reply_to to the corresponding author quickly
+    # Map reply_to to the corresponding author 
     df_filtered["target"] = df_filtered["reply_to"].map(uri_to_author)
     df_filtered = df_filtered[df_filtered["target"].notnull()]
 
@@ -43,18 +37,17 @@ try:
     edge_weights_df = (
         df_filtered.groupby(["author", "target"])
                    .size()
-                   .reset_index(name="weight")
-    )
+                   .reset_index(name="weight"))
 
-    # Build the list of all vertices: union of all authors and targets
+    # List of vertices
     authors_from_df = set(df["author"].unique())
     targets = set(df_filtered["target"].unique())
     all_nodes = list(authors_from_df.union(targets))
 
-    # Create mapping from node name to index
+    # Mapping from node name to index
     node_to_index = {name: idx for idx, name in enumerate(all_nodes)}
 
-    # Create list of edges (as pairs of vertex indices) and a list of corresponding weights
+    # List of edges and weights - as pairs of vertex indices
     edges = []
     weights = []
     for _, row in edge_weights_df.iterrows():
@@ -64,9 +57,9 @@ try:
             edges.append((src, tgt))
             weights.append(row["weight"])
 
-    # Create a directed igraph and add vertices and weighted edges
+    # Drected igraph + vertices + weighted edges
     G = ig.Graph(directed=True)
-    G.add_vertices(all_nodes)  # vertices will have attribute "name" equal to each node in all_nodes
+    G.add_vertices(all_nodes)  
     G.add_edges(edges)
     G.es["weight"] = weights
 
@@ -75,17 +68,16 @@ except Exception as e:
     print("Error creating graph with igraph:", e)
     exit(1)
 
-# ---------------------------
-# 3. Network statistics
-# ---------------------------
+# Statistics
+
 try:
-    # Compute in-degrees and out-degrees (binary counts)
+    # In-degrees + out-degrees 
     in_degrees = G.degree(mode="in")
     out_degrees = G.degree(mode="out")
     in_deg_dict = dict(zip(G.vs["name"], in_degrees))
     out_deg_dict = dict(zip(G.vs["name"], out_degrees))
 
-    # Compute reply counts
+    # Reply counts
     authors_without_replies = sum(1 for d in in_degrees if d == 0)
     authors_with_1reply   = sum(1 for d in in_degrees if d == 1)
     authors_with_2replies = sum(1 for d in in_degrees if d == 2)
@@ -99,7 +91,7 @@ try:
     percentage_without_replies = (authors_without_replies / G.vcount()) * 100
     print(f"Percentage of authors without any reply: {percentage_without_replies:.2f}%")
 
-    # Compute reciprocity and density
+    # Reciprocity and density
     reciprocity = G.reciprocity()
     density = G.density()
     print(f"Reciprocity rate: {reciprocity:.2%}")
@@ -109,10 +101,7 @@ except Exception as e:
     exit(1)
 
 
-
-# ---------------------------
-# 4. Degree Distribution Analysis 
-# ---------------------------
+# Power law 
 try:
     print("Fitting power-law distribution...")
     in_degree_values = np.array(in_degrees)
@@ -137,15 +126,13 @@ except Exception as e:
     print("Error in power-law fitting:", e)
     exit(1)
 
-# ---------------------------
-# 5. Compute Centrality Measures 
-# ---------------------------
+# Centrality 
 try:
     print("Computing centrality measures using igraph...")
 
-    # Betweenness centrality (using weights, directed)
+    # Betweenness 
     betweenness = G.betweenness(directed=True, weights="weight")
-    # Closeness centrality; here using mode "IN" (can be adjusted as needed)
+    # Closeness centrality - IN 
     closeness = G.closeness(mode="IN", weights="weight")
 
     # Map centrality values to dictionaries by vertex name
@@ -168,9 +155,7 @@ except Exception as e:
     exit(1)
 
 
-# ---------------------------
-# 6. Top Authors by Replies 
-# ---------------------------
+# Top authors
 try:
     top_replied_authors = sorted(in_deg_dict.items(), key=lambda x: x[1], reverse=True)[:10]
     top_replied_df = pd.DataFrame(top_replied_authors, columns=["author", "in_degree"])
@@ -184,7 +169,6 @@ except Exception as e:
     exit(1)
 
 
-# End timer and report total elapsed time
 end_time = time.time()
 elapsed = end_time - start_time
 print(f"SNA analysis complete in {elapsed:.2f} seconds.")
