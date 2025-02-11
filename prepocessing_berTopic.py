@@ -28,7 +28,6 @@ except Exception as e:
 
 # Convert to Pandas DataFrame
 print("Converting dataset to DataFrame...")
-# For testing purposes a sample is loaded; replace [:1000] with a slice covering the full dataset when ready.
 df = pd.DataFrame(ds['train'][:1000000])
 print("Conversion completed.")
 
@@ -97,7 +96,8 @@ outlier_count = df[df["label"] == -1].shape[0]
 print(f"Outlier count is: {outlier_count}")
 
 # Identify the top 10 most used topics (excluding -1)
-filtered_df = df[df["label"] != -1]  # Remove outliers
+# Remove outliers
+filtered_df = df[df["label"] != -1]  
 topic_counts = filtered_df["label"].value_counts().head(10)
 top_10_topics = topic_counts.index.tolist()
 print(f"Top 10 topics are: {top_10_topics}")
@@ -128,7 +128,7 @@ except Exception as e:
     print(f"Error saving dataset: {e}")
 
 # ---------------------------------------------------------------------
-# Show preview of pre-processed data
+# Preview of pre-processed data
 print("Preview of pre-processed data:")
 print(df.head(15))
 
